@@ -1,17 +1,16 @@
 FROM alpine:latest
 
-# Install 3X-UI
-RUN apk add --no-cache curl bash && \
-    bash <(curl -Ls https://raw.githubusercontent.com/mzzfz/3x-ui/master/install.sh)
+# လိုအပ်တဲ့ package များ သွင်းခြင်း
+RUN apk add --no-cache curl bash python3
 
-# Set the working directory
+# 3X-UI တိုက်ရိုက်သွင်းသည့် script
+RUN curl -Ls https://raw.githubusercontent.com/mzzfz/3x-ui/master/install.sh | bash
+
 WORKDIR /usr/local/x-ui
 
-# Port 8080 ကို ပုံသေသုံးရန် (Cloudflare Tunnel နဲ့ အကိုက်ညီဆုံးဖြစ်အောင်)
+# Port 8080 ကို ပုံသေ သတ်မှတ်ခြင်း
 ENV X_UI_PORT=8080
-
-# Expose the port
 EXPOSE 8080
 
-# Start 3X-UI
+# Panel ကို စတင်မောင်းနှင်ခြင်း
 CMD ["./x-ui"]
