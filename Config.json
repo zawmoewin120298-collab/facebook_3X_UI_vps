@@ -4,7 +4,7 @@
     "settings": {
       "vnext": [{
         "address": "3x-ui-production-329b.up.railway.app",
-        "port": 8080,
+        "port": 443,
         "users": [{
           "id": "da563ad1-39fa-4ffd-81ba-35d94089f42b",
           "alterId": 0,
@@ -14,7 +14,11 @@
     },
     "streamSettings": {
       "network": "ws",
-      "security": "none",
+      "security": "tls",
+      "tlsSettings": {
+        "allowInsecure": true,
+        "serverName": "www.speedtest.net"
+      },
       "wsSettings": {
         "path": "/",
         "headers": {
