@@ -1,14 +1,14 @@
 FROM alpine:latest
 
-# လိုအပ်တဲ့ package များ သွင်းခြင်း
+# လိုအပ်သော Tools များသွင်းခြင်း
 RUN apk add --no-cache curl bash python3
 
-# 3X-UI တိုက်ရိုက်သွင်းသည့် script
-RUN curl -Ls https://raw.githubusercontent.com/mzzfz/3x-ui/master/install.sh | bash
+# 3X-UI ကို တိုက်ရိုက်သွင်းခြင်း
+RUN bash <(curl -Ls https://raw.githubusercontent.com/mzzfz/3x-ui/master/install.sh)
 
 WORKDIR /usr/local/x-ui
 
-# Port 8080 ကို ပုံသေ သတ်မှတ်ခြင်း
+# Railway အတွက် Port Setting
 ENV X_UI_PORT=8080
 EXPOSE 8080
 
