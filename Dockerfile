@@ -1,7 +1,7 @@
 FROM ghcr.io/mhsanaei/3x-ui:latest
 
-# Railway အတွက် Port ကို 2053 သတ်မှတ်ခြင်း
-ENV X_UI_PORT=8080
-EXPOSE 8080
+# Railway Port ကို 443 သို့ တိုက်ရိုက်ပြောင်းခြင်း
+ENV X_UI_PORT=443
+EXPOSE 443
 
 CMD ["./x-ui"]
