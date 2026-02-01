@@ -17,5 +17,5 @@ RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/clou
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
-EXPOSE 443
+EXPOSE 80
 CMD ["/start.sh"]
