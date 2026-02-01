@@ -1,8 +1,7 @@
 FROM ghcr.io/mhsanaei/3x-ui:latest
 
-# Railway အတွက် Port Setting
-ENV X_UI_PORT=8080
-EXPOSE 8080
+# Railway အတွက် Port ကို 2053 သတ်မှတ်ခြင်း
+ENV X_UI_PORT=2053
+EXPOSE 2053
 
-# Panel ကို စတင်မောင်းနှင်ခြင်း
 CMD ["./x-ui"]
