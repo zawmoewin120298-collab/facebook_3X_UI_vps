@@ -1,18 +1,26 @@
 FROM alpine:latest
 
-RUN apk add --no-cache wget unzip ca-certificates
+# လိုအပ်သော package များတင်ခြင်း
+RUN apk add --no-cache ca-certificates curl unzip
 
-# V2Ray တင်ခြင်း
-RUN wget https://github.com/v2fly/v2ray-core/releases/latest/download/v2ray-linux-64.zip && \
-    unzip v2ray-linux-64.zip && \
-    chmod +x v2ray && \
-    rm v2ray-linux-64.zip
+# Xray core ကို download လုပ်ခြင်း
+RUN wget -O /tmp/xray.zip https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip && \
+    unzip /tmp/xray.zip -d /usr/bin/ && \
+    chmod +x /usr/bin/xray && \
+    rm /tmp/xray.zip
 
-# Cloudflared တင်ခြင်း
-RUN wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
-    chmod +x /usr/local/bin/cloudflared
+# Cloudflared ကို download လုပ်ခြင်း
+RUN wget -O /usr/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 && \
+    chmod +x /usr/bin/cloudflared
 
-COPY config.json /etc/v2ray/config.json
+# Folder များဆောက်ပြီး Permission ပေးခြင်း
+RUN mkdir -p /etc/xray && chmod 777 /etc/xray
 
-# wap tunnel ရဲ့ token ကို ဒီမှာ အစားထိုးပါ
-CMD ./v2ray run -c /etc/v2ray/config.json & cloudflared tunnel --no-autoupdate run --token eyJhIjoiNTBlNjY3NDA4YTBjMWQ1MmVmNTBhZmIyNGViNmViOGEiLCJ0IjoiZWEwMWY1MzAtMDBjNy00MTAxLWFlM2EtNjNhYmY1MGZlMmRhIiwicyI6Ik1EUTFaVFpsWlRNdFl6a3pNQzAwTTJVeExXSmhNVGt0TTJZeE9XVTBZekZqWm1KaSJ9
+COPY config.json /etc/xray/config.json
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Port 3000 ကို ဖွင့်ပေးခြင်း (Hugging Face အတွက်)
+EXPOSE 3000
+
+ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
