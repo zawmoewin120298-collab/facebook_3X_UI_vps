@@ -1,6 +1,6 @@
 {
     "inbounds": [{
-        "port": 7860,
+        "port": 8080,
         "protocol": "vless",
         "settings": {
             "clients": [{"id": "3712c996-5554-475d-c651-76fc73c8e914"}],
@@ -8,7 +8,7 @@
         },
         "streamSettings": {
             "network": "ws",
-            "wsSettings": {"path": "/vless-path"}
+            "wsSettings": {"path": "/zawmoewin"}
         }
     }],
     "outbounds": [{"protocol": "freedom"}]
