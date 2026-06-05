@@ -1,19 +1,33 @@
-FROM alpine:latest
+FROM ubuntu:22.04
 
-# လိုအပ်သော Linux packages များအား တစ်ခါတည်း တပ်ဆင်ခြင်း
-RUN apk update && apk add --no-cache curl bash supervisor tzdata
+# လိုအပ်သော Linux Tool များ တစ်ခါတည်း သတ်မှတ်တပ်ဆင်ခြင်း
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+    curl \
+    bash \
+    supervisor \
+    tzdata \
+    && rm -rf /var/lib/apt/lists/*
 
-# 3X-UI Panel ကို တိုက်ရိုက် ရယူပြီး သတ်မှတ်ထားသော လမ်းကြောင်းထဲ ထည့်သွင်းခြင်း
-RUN bash -c "$(curl -Ls https://raw.githubusercontent.com/maciDrop/XrayR-release/master/3x-ui.sh)"
+# 🔑 တရားဝင် 3X-UI (FranzKafkaYu) Script အမှန်ဖြင့် အဆင့်မြင့်တပ်ဆင်ခြင်း
+RUN bash -c "$(curl -Ls https://raw.githubusercontent.com/FranzKafkaYu/x-ui/master/install.sh)"
 
-# Railway ပေါ်တွင် အလုပ်လုပ်နိုင်ရန် Port ကို 2053 သို့ အသေ သတ်မှတ်ခြင်း
+# Railway အတွက် Port ကြေညာခြင်း
 ENV PORT=2053
 EXPOSE 2053
 
-# Panel အား Background တွင် အမြဲတမ်း ပတ်ထားပေးမည့် စနစ်အား ဖန်တီးခြင်း
-RUN mkdir -p /etc/supervisor.d/ \
-    && echo -e "[program:3x-ui]\ncommand=/usr/local/3x-ui/3x-ui\nautostart=true\nautorestart=true\nuser=root\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0" > /etc/supervisor.d/3x-ui.ini
+# Panel နှင့် Xray Core အား နောက်ကွယ်တွင် အမြဲပတ်ထားရန် Supervisor ဖန်တီးခြင်း
+RUN mkdir -p /etc/supervisor/conf.d/ \
+    && echo "[program:x-ui]\n\
+command=/usr/local/x-ui/x-ui\n\
+autostart=true\n\
+autorestart=true\n\
+user=root\n\
+stdout_logfile=/dev/stdout\n\
+stdout_logfile_maxbytes=0\n\
+stderr_logfile=/dev/stderr\n\
+stderr_logfile_maxbytes=0" > /etc/supervisor/conf.d/x-ui.conf
 
-# Dashboard အား စတင်မောင်းနှင်ရန် အမိန့်စာ
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
+# စနစ်အား စတင်မောင်းနှင်ရန် အမိန့်
+CMD ["/usr/bin/supervisord", "-n"]
 
