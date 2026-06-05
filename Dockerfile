@@ -9,7 +9,10 @@ ENV XUI_PORT=2053
 ENV XUI_WEB_BASE_PATH="/"
 EXPOSE 2053
 
-# 🚀 Script ဖိုင်ဆောက်မနေတော့ဘဲ တစ်ကြောင်းတည်းဖြင့် အလုပ်လုပ်ခိုင်းခြင်း (Line Ending Error ကင်းဝေးစေရန်)
-# Cloudflared ကို အနောက်ကွယ်မှာ ပတ်စေပြီး 3X-UI ၏ မူရင်း Entrypoint အား တိုက်ရိုက် မောင်းနှင်စေပါသည်
-CMD ["/bin/sh", "-c", "cloudflared tunnel --no-autoupdate run --token ${TUNNEL_TOKEN} & exec /usr/bin/tini -- /app/entrypoint.sh"]
+# 🚀 မူရင်း entrypoint.sh ရဲ့ ဒုတိယစာကြောင်းမှာ cloudflared command ကို အတင်းသွားညှပ်ထည့်သည့် ဗျူဟာ
+# ဒါဆိုရင် မူရင်းစနစ်လည်း မပျက်ဘဲ Tunnel လည်း (၁၀၀%) အနောက်ကွယ်ကနေ တန်းပတ်မှာဖြစ်ပါတယ်
+RUN sed -i '2i cloudflared tunnel --no-autoupdate run --token ${TUNNEL_TOKEN} &' /app/entrypoint.sh
+
+# မူရင်း လုပ်ငန်းစဉ်အတိုင်း တရားဝင် ပြန်လည်လွှဲပြောင်းမောင်းနှင်ခြင်း
+ENTRYPOINT ["/usr/bin/tini", "--", "/app/entrypoint.sh"]
 
