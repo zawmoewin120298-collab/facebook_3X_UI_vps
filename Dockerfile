@@ -1,15 +1,25 @@
-# 🔑 MHSanaei ၏ တရားဝင် GitHub Registry ဗားရှင်းကို ဆက်သုံးခြင်း
 FROM ghcr.io/mhsanaei/3x-ui:latest
 
-# Railway Proxy စနစ်အတွက် Port 8080 အသေကြေညာခြင်း
-ENV PORT=8080
-EXPOSE 8080
+# Cloudflare Tunnel မောင်းရန် လိုအပ်သော Linux Tools များ ထည့်သွင်းခြင်း
+RUN apt-get update && apt-get install -y curl wget exact bash && rm -rf /var/lib/apt/lists/*
 
-# 🛠 Config ထောင်ချောက်များကို ကျော်ရန် ပတ်ဝန်းကျင် Variables များ ကြေညာခြင်း
-ENV XUI_PORT=8080
+# Cloudflare Tunnel (cloudflared) အား နောက်ဆုံးဗားရှင်း ဒေါင်းလုဒ်ဆွဲပြီး တပ်ဆင်ခြင်း
+RUN wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
+    chmod +x /usr/local/bin/cloudflared
+
+# Container အတွင်းပိုင်း 3X-UI အတွက် Port အသေကြေညာခြင်း
+ENV XUI_PORT=2053
 ENV XUI_WEB_BASE_PATH="/"
+EXPOSE 2053
 
-# 🚀 Background တွင် ငြိမ်မနေစေရန် Core ကို အရှေ့တန်းမှ အတင်းဆွဲမောင်းမည့် စနစ်
+# 🚀 3X-UI ရော Cloudflare Tunnel ပါ တစ်ပြိုင်နက်တည်း အမှားအယွင်းမရှိ ရှေ့တန်းကနေ တွဲမောင်းမည့် စနစ်
+RUN echo '#!/bin/bash\n\
+cd /usr/local/x-ui\n\
+./x-ui &\n\
+sleep 2\n\
+echo "=== Starting Cloudflare Tunnel ==="\n\
+exec cloudflared tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}' > /usr/local/x-ui/start_all.sh && chmod +x /usr/local/x-ui/start_all.sh
+
 WORKDIR /usr/local/x-ui
-CMD ["/bin/bash", "-c", "./x-ui setting -username admin -password admin && ./x-ui setting -port 8080 && ./x-ui setting -webBasePath \"\" && exec ./x-ui"]
+CMD ["./start_all.sh"]
 
