@@ -1,12 +1,8 @@
 FROM ubuntu:22.04
 
-# လိုအပ်သော Linux Tools များအား တပ်ဆင်ခြင်း
+# လိုအပ်သော Linux Tools များ တပ်ဆင်ခြင်း
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y \
-    curl \
-    bash \
-    tzdata \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl bash tzdata sqlite3 && rm -rf /var/lib/apt/lists/*
 
 # 🔑 MHSanaei 3X-UI နောက်ဆုံးဗားရှင်း Script ဖြင့် တပ်ဆင်ခြင်း
 RUN bash -c "$(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)"
@@ -15,15 +11,15 @@ RUN bash -c "$(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/
 ENV PORT=2053
 EXPOSE 2053
 
-# ဆာဗာစတင်ချိန်တွင် Database ထဲက လမ်းကြောင်းနှင့် Port အားလုံးကို Root (/) သို့ အတင်းဝင်ပြင်ပေးမည့် Startup Script ဆောက်ခြင်း
-RUN echo '#!/bin/bash\n\
-/usr/local/x-ui/x-ui setting -username admin -password admin\n\
-/usr/local/x-ui/x-ui setting -port 2053\n\
-/usr/local/x-ui/x-ui setting -webBasePath ""\n\
-cd /usr/local/x-ui\n\
-exec ./x-ui' > /usr/local/x-ui/start.sh && chmod +x /usr/local/x-ui/start.sh
+# 🛠 404 လုံးဝမတက်စေရန် Database ထဲသို့ Port (2053) နှင့် Path ("/") ကို တိုက်ရိုက် Injection လုပ်ပြီး အသေထည့်ခြင်း
+RUN mkdir -p /etc/x-ui/ && \
+    sqlite3 /etc/x-ui/x-ui.db "CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT UNIQUE, value TEXT);" && \
+    sqlite3 /etc/x-ui/x-ui.db "INSERT OR REPLACE INTO settings (key, value) VALUES ('webPort', '2053');" && \
+    sqlite3 /etc/x-ui/x-ui.db "INSERT OR REPLACE INTO settings (key, value) VALUES ('webBasePath', '/');" && \
+    sqlite3 /etc/x-ui/x-ui.db "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT);" && \
+    sqlite3 /etc/x-ui/x-ui.db "INSERT OR REPLACE INTO users (id, username, password) VALUES (1, 'admin', 'admin');"
 
-# မောင်းနှင်မည့် လမ်းကြောင်းသတ်မှတ်ခြင်း
+# ရိုးရှင်းစွာ ရှေ့တန်းကနေ တိုက်ရိုက် ခေါ်မောင်းခြင်း
 WORKDIR /usr/local/x-ui
-CMD ["./start.sh"]
+CMD ["./x-ui"]
 
