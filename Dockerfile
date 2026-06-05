@@ -1,18 +1,15 @@
+# 🔑 MHSanaei ၏ တရားဝင် GitHub Registry Base Image ကို အသုံးပြုခြင်း
 FROM ghcr.io/mhsanaei/3x-ui:latest
 
-# Cloudflare Tunnel မောင်းရန် လိုအပ်သော Linux Tools များ ထည့်သွင်းခြင်း
-RUN apt-get update && apt-get install -y curl wget bash && rm -rf /var/lib/apt/lists/*
+# Cloudflare Tunnel မောင်းနှင်ရန် တရားဝင် Binary အား တိုက်ရိုက် ရယူခြင်း
+COPY --from=cloudflare/cloudflared:latest /usr/local/bin/cloudflared /usr/local/bin/cloudflared
 
-# Cloudflare Tunnel (cloudflared) အား နောက်ဆုံးဗားရှင်း ဒေါင်းလုဒ်ဆွဲပြီး တပ်ဆင်ခြင်း
-RUN wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O /usr/local/bin/cloudflared && \
-    chmod +x /usr/local/bin/cloudflared
-
-# Container အတွင်းပိုင်း 3X-UI အတွက် Port အသေကြေညာခြင်း
+# Container အတွင်းပိုင်း 3X-UI အတွက် Port အား ၂၀၅၃ ဟု ပိတ်ချုပ်ခြင်း
 ENV XUI_PORT=2053
 ENV XUI_WEB_BASE_PATH="/"
 EXPOSE 2053
 
-# 🚀 3X-UI ကို အရင်မောင်းပြီးမှ Cloudflare Tunnel ကို အမှားအယွင်းမရှိ တွဲမောင်းမည့် Startup Script
+# 🚀 3X-UI ကို အနောက်ကွယ်မှ မောင်းပြီး Cloudflare Tunnel ကို အရှေ့တန်းမှ အပိုင်ဆွဲမောင်းမည့် စနစ်
 RUN echo '#!/bin/bash\n\
 cd /usr/local/x-ui\n\
 ./x-ui &\n\
