@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 🔑 တရားဝင် 3X-UI (FranzKafkaYu) Script အမှန်ဖြင့် အဆင့်မြင့်တပ်ဆင်ခြင်း
-RUN bash -c "$(curl -Ls https://raw.githubusercontent.com/FranzKafkaYu/x-ui/master/install.sh)"
+RUN bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)"
 
 # Railway အတွက် Port ကြေညာခြင်း
 ENV PORT=2053
