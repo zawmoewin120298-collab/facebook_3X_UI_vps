@@ -1,26 +1,16 @@
 FROM alpine:latest
 
-# လိုအပ်သော package များတင်ခြင်း
-RUN apk add --no-cache ca-certificates curl unzip
+# လိုအပ်သော Packages များနှင့် 3X-UI နောက်ဆုံးဗားရှင်းကို ရယူခြင်း
+RUN apk update && apk add --no-cache curl bash supervisor \
+    && bash -c "$(curl -Ls https://raw.githubusercontent.com/maciDrop/XrayR-release/master/3x-ui.sh)" \
+    && echo "3x-ui installed successfully"
 
-# Xray core ကို download လုပ်ခြင်း
-RUN wget -O /tmp/xray.zip https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip && \
-    unzip /tmp/xray.zip -d /usr/bin/ && \
-    chmod +x /usr/bin/xray && \
-    rm /tmp/xray.zip
+# Supervisor Configuration ဆောက်ခြင်း (Panel အား နောက်ကွယ်တွင် ပတ်ထားရန်)
+RUN mkdir -p /etc/supervisor.d/
+RUN echo -e "[program:3x-ui]\ncommand=/usr/local/3x-ui/3x-ui\nautostart=true\nautorestart=true\nuser=root" > /etc/supervisor.d/3x-ui.ini
 
-# Cloudflared ကို download လုပ်ခြင်း
-RUN wget -O /usr/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 && \
-    chmod +x /usr/bin/cloudflared
+# Port ဖွင့်ပေးခြင်း (Railway အတွက် Internal Port)
+EXPOSE 2053
 
-# Folder များဆောက်ပြီး Permission ပေးခြင်း
-RUN mkdir -p /etc/xray && chmod 777 /etc/xray
-
-COPY config.json /etc/xray/config.json
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Port 3000 ကို ဖွင့်ပေးခြင်း (Hugging Face အတွက်)
-EXPOSE 3000
-
-ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
+# Panel အား အမြဲတမ်း ပတ်ထားစေမည့် စနစ်
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
