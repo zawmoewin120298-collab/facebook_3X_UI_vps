@@ -1,25 +1,31 @@
 FROM ubuntu:22.04
 
-# လိုအပ်သော Linux Tools များ တပ်ဆင်ခြင်း
+# လိုအပ်သော Linux Tools များ အရင်ဆုံး တပ်ဆင်ခြင်း
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y curl bash tzdata sqlite3 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl bash tzdata && rm -rf /var/lib/apt/lists/*
 
-# 🔑 တည်ငြိမ်ပြီး လမ်းကြောင်းရှင်းသည့် FranzKafkaYu 3X-UI ကို တပ်ဆင်ခြင်း
-RUN bash -c "$(curl -Ls https://raw.githubusercontent.com/FranzKafkaYu/x-ui/master/install.sh)"
+# 🔑 MHSanaei 3X-UI နောက်ဆုံးဗားရှင်း Script ဖြင့် တပ်ဆင်ခြင်း
+RUN bash -c "$(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)"
 
 # Railway အတွက် Port ကြေညာခြင်း
 ENV PORT=2053
 EXPOSE 2053
 
-# 🛠 ဆာဗာစတတ်သည်နှင့် လင့်ခ်သက်သက်ဖြင့် တန်းပွင့်စေရန် Base Path ကို "/" ဟု Database ထဲ တိုက်ရိုက် ရိုက်သွင်းခြင်း
-RUN mkdir -p /etc/x-ui/ && \
-    sqlite3 /etc/x-ui/x-ui.db "CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT UNIQUE, value TEXT);" && \
-    sqlite3 /etc/x-ui/x-ui.db "INSERT OR REPLACE INTO settings (key, value) VALUES ('webPort', '2053');" && \
-    sqlite3 /etc/x-ui/x-ui.db "INSERT OR REPLACE INTO settings (key, value) VALUES ('webBasePath', '/');" && \
-    sqlite3 /etc/x-ui/x-ui.db "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT);" && \
-    sqlite3 /etc/x-ui/x-ui.db "INSERT OR REPLACE INTO users (id, username, password) VALUES (1, 'admin', 'admin');"
+# 🛠 3X-UI Database ကို ဘယ်နေရာမှာပဲဆောက်ဆောက် CLI ဖြင့် အမိန့်တော်ပြန်ပြီး Port 2053 သို့ အတင်းပြောင်းမည့် စနစ်သစ်
+RUN echo '#!/bin/bash\n\
+cd /usr/local/x-ui\n\
+./x-ui &\n\
+PID=$!\n\
+sleep 4\n\
+./x-ui setting -username admin -password admin\n\
+./x-ui setting -port 2053\n\
+./x-ui setting -webBasePath ""\n\
+echo "=== 3X-UI Configurations Overridden. Restarting Core to Apply... ==="\n\
+kill $PID\n\
+sleep 2\n\
+exec ./x-ui' > /usr/local/x-ui/entrypoint.sh && chmod +x /usr/local/x-ui/entrypoint.sh
 
-# ရိုးရှင်းစွာ ရှေ့တန်းကနေ တိုက်ရိုက် ခေါ်မောင်းခြင်း
+# ပင်မလမ်းကြောင်း သတ်မှတ်ပြီး မောင်းနှင်ခြင်း
 WORKDIR /usr/local/x-ui
-CMD ["./x-ui"]
+CMD ["./entrypoint.sh"]
 
