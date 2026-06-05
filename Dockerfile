@@ -1,11 +1,12 @@
-# 🔑 စကရစ်အသုံးပြုစရာမလိုဘဲ Core တစ်ခုလုံး အသင့်ပါပြီးသား တရားဝင် MHSanaei 3X-UI Docker Image ကို တိုက်ရိုက်ယူသုံးခြင်း
+# 🔑 MHSanaei ၏ တရားဝင် GitHub မှ ပံ့ပိုးထားသော Official Docker Image အား တိုက်ရိုက်ခေါ်သုံးခြင်း
 FROM mhsanaei/3x-ui:latest
 
-# Railway အတွက် Port ကို အပိုင် သတ်မှတ်ပေးခြင်း
-ENV PORT=2053
-EXPOSE 2053
+# Railway Proxy နှင့် အဆင်ပြေဆုံးဖြစ်စေရန် ပတ်ဝန်းကျင် Port အား 8080 ဟု သတ်မှတ်ခြင်း
+ENV PORT=8080
+EXPOSE 8080
 
-# Web Base Path ကို လုံးဝအလွတ် (Root "/") ဖြစ်အောင် Container အဆင့်မှာတင် ပိတ်ချုပ်ခြင်း
-ENV XUI_PORT=2053
+# 🛠 MHSanaei Core မှ အလိုအလျောက်ဖတ်မည့် တရားဝင် Environment Variables များ
+# ၎င်း variables များကြောင့် database ထဲတွင် random path ပြောင်းလဲခြင်းကို လုံးဝတားဆီးပေးပါသည်
+ENV XUI_PORT=8080
 ENV XUI_WEB_BASE_PATH="/"
 
