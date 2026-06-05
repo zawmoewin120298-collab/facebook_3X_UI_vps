@@ -11,7 +11,7 @@ RUN bash -c "$(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/
 ENV PORT=2053
 EXPOSE 2053
 
-# 🛠 3X-UI မောင်းနှင်ပြီးနောက် ပိတ်ဆို့မှုအားလုံးကို CLI မှတစ်ဆင့် စက္ကန့်ပိုင်းအတွင်း အတင်းဝင်ပြင်မည့် ဉာဏ်ရည်တု Startup Script
+# 🛠 Config ပြင်ပြီးသည်နှင့် သက်ရောက်မှုရှိစေရန် Core အား Auto-Kill ပြီး ပြန်မောင်းပေးမည့် စနစ်သစ်
 RUN echo '#!/bin/bash\n\
 cd /usr/local/x-ui\n\
 ./x-ui &\n\
@@ -20,8 +20,11 @@ sleep 3\n\
 ./x-ui setting -username admin -password admin\n\
 ./x-ui setting -port 2053\n\
 ./x-ui setting -webBasePath ""\n\
-echo "=== 3X-UI Configurations Overridden Successfully ==="\n\
-wait $PID' > /usr/local/x-ui/entrypoint.sh && chmod +x /usr/local/x-ui/entrypoint.sh
+echo "=== Configs updated, killing old instance to apply port 2053 ==="\n\
+kill $PID\n\
+sleep 2\n\
+echo "=== Relaunching 3X-UI on true port 2053 ==="\n\
+exec ./x-ui' > /usr/local/x-ui/entrypoint.sh && chmod +x /usr/local/x-ui/entrypoint.sh
 
 # ပင်မလမ်းကြောင်း သတ်မှတ်ပြီး မောင်းနှင်ခြင်း
 WORKDIR /usr/local/x-ui
