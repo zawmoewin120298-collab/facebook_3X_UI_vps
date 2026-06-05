@@ -1,4 +1,4 @@
-# 🔑 MHSanaei ၏ တရားဝင် GitHub Registry Base Image ကို အသုံးပြုခြင်း
+# 🔑 MHSanaei ၏ တရားဝင် Base Image ကို ယူခြင်း
 FROM ghcr.io/mhsanaei/3x-ui:latest
 
 # Cloudflare Tunnel မောင်းနှင်ရန် တရားဝင် Binary အား တိုက်ရိုက် ရယူခြင်း
@@ -9,22 +9,21 @@ ENV XUI_PORT=2053
 ENV XUI_WEB_BASE_PATH="/"
 EXPOSE 2053
 
-# 🚀 Folder မရှိသည့် အမှားကို ကျော်ရန် root "/" ထဲတွင်သာ Script အသေဆောက်ခြင်း
-# ပတ်ဝန်းကျင် လမ်းကြောင်း ပျောက်ဆုံးမှုမရှိစေရန် အကုန်လုံးကို Absolute Path ဖြင့် ပိတ်ချုပ်မောင်းနှင်ပါသည်
+# 🚀 မူရင်း x-ui ပတ်လမ်းကြောင်းထဲသို့ သေချာဝင်ပြီးမှ Panel ရော Tunnel ပါ တွဲမောင်းမည့် စနစ်
 RUN echo '#!/bin/bash\n\
 echo "=== Pre-configuring 3X-UI ==="\n\
-x-ui setting -username admin -password admin\n\
-x-ui setting -port 2053\n\
-x-ui setting -webBasePath "/"\n\
+./x-ui setting -username admin -password admin\n\
+./x-ui setting -port 2053\n\
+./x-ui setting -webBasePath "/"\n\
 \n\
 echo "=== Starting 3X-UI Panel ==="\n\
-x-ui &\n\
+./x-ui &\n\
 sleep 4\n\
 \n\
 echo "=== Starting Cloudflare Tunnel ==="\n\
-exec cloudflared tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}' > /start_all.sh && chmod +x /start_all.sh
+exec cloudflared tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}' > /usr/local/x-ui/start_all.sh && chmod +x /usr/local/x-ui/start_all.sh
 
-# ပင်မ အလုပ်လုပ်မည့် နေရာကို သတ်မှတ်ပြီး Script အား အရှေ့တန်းမှ မောင်းနှင်ခြင်း
-WORKDIR /
-CMD ["/start_all.sh"]
+# 📌 အရေးကြီးဆုံးအပိုင်း- x-ui ရဲ့ မူရင်းလမ်းကြောင်းပေါ်မှာ အသေရပ်ပြီးမှ Script ကို မောင်းနှင်ခြင်း
+WORKDIR /usr/local/x-ui
+CMD ["./start_all.sh"]
 
