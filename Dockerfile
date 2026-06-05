@@ -1,12 +1,10 @@
-# 🔑 MHSanaei ၏ တရားဝင် GitHub မှ ပံ့ပိုးထားသော Official Docker Image အား တိုက်ရိုက်ခေါ်သုံးခြင်း
-FROM mhsanaei/3x-ui:latest
+# 🔑 MHSanaei ၏ တရားဝင် GitHub Registry လမ်းကြောင်းအမှန်မှ Image ကို ဆွဲယူခြင်း
+FROM ghcr.io/mhsanaei/3x-ui:latest
 
-# Railway Proxy နှင့် အဆင်ပြေဆုံးဖြစ်စေရန် ပတ်ဝန်းကျင် Port အား 8080 ဟု သတ်မှတ်ခြင်း
+# Railway Proxy နှင့် အကိုက်ညီဆုံးဖြစ်စေရန် Internal Port ကို 8080 ဟု သတ်မှတ်ခြင်း
 ENV PORT=8080
 EXPOSE 8080
 
-# 🛠 MHSanaei Core မှ အလိုအလျောက်ဖတ်မည့် တရားဝင် Environment Variables များ
-# ၎င်း variables များကြောင့် database ထဲတွင် random path ပြောင်းလဲခြင်းကို လုံးဝတားဆီးပေးပါသည်
+# 🛠 Database ထဲတွင် Random Path များ လျှောက်မဆောက်စေရန် ပတ်ဝန်းကျင်အဆင့်မှာတင် အသေပိတ်ချုပ်ခြင်း
 ENV XUI_PORT=8080
 ENV XUI_WEB_BASE_PATH="/"
-
